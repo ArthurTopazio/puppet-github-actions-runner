@@ -6,6 +6,7 @@
       String $hostname,
       String $assured_labels,
       Boolean $disable_update,
+      Boolean $no_default_labels = false,
 | -%>
 #!/bin/bash
 # Configure the action runner after the package file has been downloaded.
@@ -37,7 +38,10 @@ AWS_REGION=$(curl -f -H "X-aws-ec2-metadata-token: $AWS_TOKEN" http://169.254.16
   --replace                                      \
   --name ${INSTANCE_ID}                          \
   --url <%= $url %>                              \
-  --token ${TOKEN}                               \
+  --token ${TOKEN}
+  <%- if $no_default_labels { -%>
+  --no-default-labels                            \
+  <%- } -%>                               \
   --labels ${AWS_REGION},${ACCOUNT_ID}           \
   <%- if $disable_update { -%>
   --disableupdate                                \

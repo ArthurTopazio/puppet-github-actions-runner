@@ -38,6 +38,9 @@
 # * disable_update
 # Optional[Boolean], toggle for disabling automatic runner updates.
 #
+# * no_default_labels
+# Optional[Boolean], maps to config.sh `--no-default-labels` so only explicit `--labels` are applied.
+#
 # * repo_name
 # Optional[String], actions runner repository name.
 #
