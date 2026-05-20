@@ -4,7 +4,7 @@
       Stdlib::Absolutepath $root_dir,
       String $url,
       String $hostname,
-      String $assured_labels,
+      String $puppet_labels_csv,
       Boolean $disable_update,
       Boolean $no_default_labels = false,
 | -%>
@@ -32,21 +32,27 @@ AWS_REGION=$(curl -f -H "X-aws-ec2-metadata-token: $AWS_TOKEN" http://169.254.16
   --name ${INSTANCE_ID}
 
 
-# Configure the runner.
+# Single --labels: Hiera/custom labels first, then dynamic region & account ID (comma-separated).
+# Example: shiftmarkets-staging,us-east-1,481321020530
+<%- if $puppet_labels_csv != '' { -%>
+LABELS="<%= $puppet_labels_csv %>,${AWS_REGION},${ACCOUNT_ID}"
+<%- } else { -%>
+LABELS="${AWS_REGION},${ACCOUNT_ID}"
+<%- } -%>
+
 <%= $root_dir %>/<%= $instance_name %>/config.sh \
   --unattended                                   \
   --replace                                      \
   --name ${INSTANCE_ID}                          \
   --url <%= $url %>                              \
-  --token ${TOKEN}
+  --token ${TOKEN}                               \
   <%- if $no_default_labels { -%>
   --no-default-labels                            \
-  <%- } -%>                               \
-  --labels ${AWS_REGION},${ACCOUNT_ID}           \
+  <%- } -%>
+  --labels "${LABELS}"                           \
   <%- if $disable_update { -%>
   --disableupdate                                \
   <%- } -%>
-  <%= $assured_labels %>
 
 # Copy service endpoint script.
 if [ ! -f <%= $root_dir %>/<%= $instance_name %>/runsvc.sh ]; then

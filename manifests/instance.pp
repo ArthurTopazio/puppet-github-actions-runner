@@ -70,6 +70,7 @@ define github_actions_runner::instance (
   Optional[String[1]]            $https_proxy           = $github_actions_runner::https_proxy,
   Optional[String[1]]            $no_proxy              = $github_actions_runner::no_proxy,
   Optional[Boolean]              $disable_update        = $github_actions_runner::disable_update,
+  Optional[Boolean]              $no_default_labels     = false,
   Optional[Array[String[1]]]     $labels                = undef,
   Optional[String[1]]            $enterprise_name       = $github_actions_runner::enterprise_name,
   Optional[String[1]]            $org_name              = $github_actions_runner::org_name,
@@ -78,11 +79,9 @@ define github_actions_runner::instance (
   Optional[Hash[String, String]] $env                   = $github_actions_runner::env,
 ) {
 
-  if $labels {
-    $flattend_labels_list = join($labels, ',')
-    $assured_labels = "--labels ${flattend_labels_list}"
-  } else {
-    $assured_labels = ''
+  $labels_csv_for_epp = $labels ? {
+    undef   => '',
+    default => join($labels, ','),
   }
 
   if $org_name {
@@ -142,8 +141,9 @@ define github_actions_runner::instance (
       root_dir              => $github_actions_runner::root_dir,
       url                   => $url,
       hostname              => $hostname,
-      assured_labels        => $assured_labels,
+      puppet_labels_csv     => $labels_csv_for_epp,
       disable_update        => $disable_update,
+      no_default_labels     => $no_default_labels,
     }),
     notify  => Exec["${instance_name}-run_configure_install_runner.sh"],
     require => Archive["${instance_name}-${archive_name}"],
