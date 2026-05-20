@@ -4,7 +4,7 @@
       Stdlib::Absolutepath $root_dir,
       String $url,
       String $hostname,
-      String $puppet_labels_csv,
+      String $assured_labels,
       Boolean $disable_update,
       Boolean $no_default_labels = false,
 | -%>
@@ -32,10 +32,9 @@ AWS_REGION=$(curl -f -H "X-aws-ec2-metadata-token: $AWS_TOKEN" http://169.254.16
   --name ${INSTANCE_ID}
 
 
-# Single --labels: Hiera/custom labels first, then dynamic region & account ID (comma-separated).
-# Example: shiftmarkets-staging,us-east-1,481321020530
-<%- if $puppet_labels_csv != '' { -%>
-LABELS="<%= $puppet_labels_csv %>,${AWS_REGION},${ACCOUNT_ID}"
+# Configure the runner.
+<%- if $assured_labels != '' { -%>
+LABELS="<%= $assured_labels %>,${AWS_REGION},${ACCOUNT_ID}"
 <%- } else { -%>
 LABELS="${AWS_REGION},${ACCOUNT_ID}"
 <%- } -%>

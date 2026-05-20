@@ -79,7 +79,7 @@ define github_actions_runner::instance (
   Optional[Hash[String, String]] $env                   = $github_actions_runner::env,
 ) {
 
-  $labels_csv_for_epp = $labels ? {
+  $assured_labels = $labels ? {
     undef   => '',
     default => join($labels, ','),
   }
@@ -141,7 +141,7 @@ define github_actions_runner::instance (
       root_dir              => $github_actions_runner::root_dir,
       url                   => $url,
       hostname              => $hostname,
-      puppet_labels_csv     => $labels_csv_for_epp,
+      assured_labels        => $assured_labels,
       disable_update        => $disable_update,
       no_default_labels     => $no_default_labels,
     }),
