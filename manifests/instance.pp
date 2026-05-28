@@ -80,7 +80,7 @@ define github_actions_runner::instance (
 ) {
 
   $assured_labels = $labels ? {
-    undef   => '',
+    undef   => undef,
     default => join($labels, ','),
   }
 

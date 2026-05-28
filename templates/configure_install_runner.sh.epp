@@ -4,7 +4,7 @@
       Stdlib::Absolutepath $root_dir,
       String $url,
       String $hostname,
-      String $assured_labels,
+      Optional[String] $assured_labels = undef,
       Boolean $disable_update,
       Boolean $no_default_labels = false,
 | -%>
@@ -33,12 +33,6 @@ AWS_REGION=$(curl -f -H "X-aws-ec2-metadata-token: $AWS_TOKEN" http://169.254.16
 
 
 # Configure the runner.
-<%- if $assured_labels != '' { -%>
-LABELS="<%= $assured_labels %>,${AWS_REGION},${ACCOUNT_ID}"
-<%- } else { -%>
-LABELS="${AWS_REGION},${ACCOUNT_ID}"
-<%- } -%>
-
 <%= $root_dir %>/<%= $instance_name %>/config.sh \
   --unattended                                   \
   --replace                                      \
@@ -48,7 +42,7 @@ LABELS="${AWS_REGION},${ACCOUNT_ID}"
   <%- if $no_default_labels { -%>
   --no-default-labels                            \
   <%- } -%>
-  --labels "${LABELS}"                           \
+  --labels "<%- if $assured_labels { -%><%= $assured_labels %>,${AWS_REGION},${ACCOUNT_ID}<%- } else { -%>${AWS_REGION},${ACCOUNT_ID}<%- } -%>" \
   <%- if $disable_update { -%>
   --disableupdate                                \
   <%- } -%>
